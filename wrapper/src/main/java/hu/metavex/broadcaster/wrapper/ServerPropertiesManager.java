@@ -22,19 +22,10 @@ public class ServerPropertiesManager {
 
     public void updateProperties(Map<String, String> updates) {
         if (!Files.exists(propertiesFile)) {
-            // If it doesn't exist, we might be running before the server is installed.
-            // But usually, we install/update first, then configure.
-            // If it doesn't exist, we can create a basic one or wait.
-            // For now, let's create it if missing, or just return.
-            // Better to let the server generate default? No, we need to set values.
-            // Let's create it.
-            try {
-                Files.createDirectories(propertiesFile.getParent());
-                Files.createFile(propertiesFile);
-            } catch (IOException e) {
-                LOGGER.error("Failed to create server.properties", e);
-                return;
-            }
+            // If it doesn't exist, the Bedrock server hasn't been installed yet.
+            // Don't create an empty file - wait for the Updater to extract the server first.
+            LOGGER.warn("server.properties not found. Waiting for Bedrock server installation...");
+            return;
         }
 
         try {
