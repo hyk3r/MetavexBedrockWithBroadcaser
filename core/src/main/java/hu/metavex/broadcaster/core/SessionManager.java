@@ -179,16 +179,21 @@ public class SessionManager {
             }
         }
 
-
         PutRequest put = new PutRequest(url);
-        put.setContent(new StringContent(GSON.toJson(req)));
+        String requestBody = GSON.toJson(req);
+        LOGGER.debug("Session request URL: " + url);
+        LOGGER.debug("Session request body: " + requestBody);
+        put.setContent(new StringContent(requestBody));
         put.setHeader(HttpHeaders.AUTHORIZATION, token);
         put.setHeader("x-xbl-contract-version", "107");
         put.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
         HttpResponse resp = client.execute(put);
         if (resp.getStatusCode() >= 400) {
-            throw new IOException("Failed to create session: " + resp.getStatusCode() + " " + resp.getContent());
+            String errorBody = resp.getContentAsString();
+            LOGGER.error("Session creation failed. Request: " + requestBody);
+            LOGGER.error("Session creation response: " + errorBody);
+            throw new IOException("Failed to create session: " + resp.getStatusCode() + " " + errorBody);
         }
 
         LOGGER.info(TranslationManager.get("session.created", sessionName));

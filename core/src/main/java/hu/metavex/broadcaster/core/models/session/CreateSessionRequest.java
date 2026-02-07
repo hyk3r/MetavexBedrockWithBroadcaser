@@ -23,7 +23,7 @@ public record CreateSessionRequest(
         systemProperties.put("broadcastSetting", 3);
         systemProperties.put("onlineCrossPlatformGame", true);
         systemProperties.put("crossPlayDisabled", false);
-        systemProperties.put("titleId", 0); // Need to check if 0 is valid or if we need a real title ID. Typically 0 works for custom servers or specific ID. 
+        systemProperties.put("titleId", 896928775); // Minecraft Bedrock Title ID
         // Original code used Constants.TITLE_ID? Or 896928775 (Minecraft Bedrock Title ID)
         systemProperties.put("transportLayer", 0); // 0 = Raquel ?
         // NetherNet requires connection info. 
