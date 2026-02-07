@@ -8,9 +8,9 @@
     "name": "MetavexMCBroadcaster",
     "author": "hello@metavex.hu",
     "description": "Minecraft Bedrock Szerver Xbox Live Presence tamogatassal.",
-    "features": null,
+    "features": [],
     "docker_images": {
-        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17"
+        "Java 21": "ghcr.io/pterodactyl/yolks:java_21"
     },
     "file_denylist": [],
     "startup": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
@@ -22,8 +22,8 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/bash\r\n# MetavexMCBroadcaster install script.\r\n#\r\n# Server Files: \/mnt\/server\r\ncd \/mnt\/server\r\n\r\napt update\r\napt install -y curl jq\r\n\r\nGITHUB_PACKAGE=\"hyk3r\/MetavexBedrockWithBroadcaser\"\r\necho \"Checking releases for $GITHUB_PACKAGE...\"\r\n\r\nLATEST_JSON=$(curl --silent \"https:\/\/api.github.com\/repos\/$GITHUB_PACKAGE\/releases\/latest\")\r\nDOWNLOAD_URL=$(echo $LATEST_JSON | jq -r '.assets[] | select(.name | endswith(\".jar\")) | .browser_download_url' | head -n 1)\r\n\r\nif [ ! -z \"$DOWNLOAD_URL\" ] && [ \"$DOWNLOAD_URL\" != \"null\" ]; then\r\n    echo \"Release found, downloading: $DOWNLOAD_URL\"\r\n    curl -L -o ${SERVER_JARFILE} \"$DOWNLOAD_URL\"\r\nelse\r\n    echo \"No release found or API error.\"\r\n    echo \"PLEASE UPLOAD ${SERVER_JARFILE} MANUALLY VIA SFTP!\"\r\n    # Create a dummy file if not exists to prevent crash loop immediately, or let it fail.\r\n    # We let it fail so user sees the error.\r\nfi\r\n",
-            "container": "ghcr.io\/pterodactyl\/installers:debian",
+            "script": "#!/bin/bash\r\n# MetavexMCBroadcaster install script.\r\n#\r\n# Server Files: /mnt/server\r\ncd /mnt/server\r\n\r\napt update\r\napt install -y curl jq\r\n\r\nGITHUB_PACKAGE=\"hyk3r/MetavexBedrockWithBroadcaser\"\r\necho \"Checking releases for $GITHUB_PACKAGE...\"\r\n\r\nLATEST_JSON=$(curl --silent \"https://api.github.com/repos/$GITHUB_PACKAGE/releases/latest\")\r\nDOWNLOAD_URL=$(echo $LATEST_JSON | jq -r '.assets[] | select(.name | endswith(\".jar\")) | .browser_download_url' | head -n 1)\r\n\r\nif [ ! -z \"$DOWNLOAD_URL\" ] && [ \"$DOWNLOAD_URL\" != \"null\" ]; then\r\n    echo \"Release found, downloading: $DOWNLOAD_URL\"\r\n    curl -L -o ${SERVER_JARFILE} \"$DOWNLOAD_URL\"\r\nelse\r\n    echo \"No release found or API error.\"\r\n    echo \"PLEASE UPLOAD ${SERVER_JARFILE} MANUALLY VIA SFTP!\"\r\nfi\r\n",
+            "container": "ghcr.io/pterodactyl/installers:debian",
             "entrypoint": "bash"
         }
     },
