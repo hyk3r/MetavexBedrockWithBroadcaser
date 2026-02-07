@@ -54,4 +54,4 @@ java -jar MetavexMCBroadcaster.jar
 - **Token hiba**: Töröld az `auth_cache.json` fájlt és logolj be újra
 
 ---
-© 2024 Metavex
+© 2024 Metavex - És az ÁDI fiú nem szól bele így marad! 
