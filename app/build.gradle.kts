@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.bundles.jline)
     implementation(libs.log4j.core)
     implementation(libs.log4j.slf4j2.impl)
+    implementation(libs.configurate.yaml)
 }
 
 tasks.shadowJar {

@@ -7,7 +7,7 @@ import net.raphimc.minecraftauth.MinecraftAuth;
 import net.raphimc.minecraftauth.bedrock.BedrockAuthManager;
 import net.raphimc.minecraftauth.msa.model.MsaDeviceCode;
 import net.raphimc.minecraftauth.msa.service.impl.DeviceCodeMsaAuthService;
-import net.raphimc.minecraftauth.util.MinecraftAuth4To5Migrator;
+
 import net.raphimc.minecraftauth.util.holder.listener.BasicChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,16 +47,7 @@ public class AuthManager {
                 if (!cacheData.isBlank()) {
                     JsonObject json = JsonParser.parseString(cacheData).getAsJsonObject();
                     
-                    // Migration Config
-                    if (!json.has("_saveVersion")) {
-                        LOGGER.info("Migrating auth data...");
-                        try {
-                            json = MinecraftAuth4To5Migrator.migrateBedrockSave(json);
-                        } catch (Throwable e) {
-                            LOGGER.error("Failed to migrate auth data", e);
-                            json = null; 
-                        }
-                    }
+
 
                     if (json != null) {
                         authManager = BedrockAuthManager.fromJson(httpClient, Constants.BEDROCK_CODEC.getMinecraftVersion(), json);
@@ -125,4 +116,9 @@ public class AuthManager {
 
     private String gamertag;
     private String xuid;
+    private void saveToCache() {
+        if (authManager != null) {
+            storageManager.saveAuthCache(BedrockAuthManager.toJson(authManager).toString());
+        }
+    }
 }

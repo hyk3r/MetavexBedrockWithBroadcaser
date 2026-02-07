@@ -48,7 +48,7 @@ public class Updater {
                 return;
             }
 
-            String html = response.getBodyAsString();
+            String html = response.getContentAsString();
             Matcher matcher = LINK_PATTERN.matcher(html);
             if (matcher.find()) {
                 String downloadUrl = matcher.group();

@@ -9,7 +9,7 @@ log4j = "2.20.0"
 jline = "3.23.0"
 terminalconsoleappender = "1.3.0"
 methanol = "1.7.0"
-minecraftauth = "4.1.2-SNAPSHOT"
+minecraftauth = "9aa4034194"
 gson = "2.11.0"
 sqlite = "3.50.2.0"
 webrtc = "1.0.3"
@@ -17,7 +17,7 @@ configurate = "4.2.0-GeyserMC-20251111.004649-11"
 configurate-core = "4.2.0-GeyserMC-20251111.004649-12"
 netty-transport-nethernet = "1.6.1"
 
-shadow = "9.3.0"
+shadow = "7.1.2"
 indra = "3.1.3"
 blossom = "2.1.0"
 
@@ -40,7 +40,7 @@ java-websocket = { group = "org.java-websocket", name = "Java-WebSocket", versio
 nimbus-jose-jwt = { group = "com.nimbusds", name = "nimbus-jose-jwt", version.ref = "nimbus-jose-jwt" }
 
 # Plugins
-shadow = { group = "com.gradleup.shadow", name = "shadow-gradle-plugin", version.ref = "shadow" }
+shadow = { group = "com.github.johnrengelman", name = "shadow-gradle-plugin", version.ref = "shadow" }
 indra-git = { group = "net.kyori", name = "indra-git", version.ref = "indra" }
 blossom = { group = "net.kyori", name = "blossom", version.ref = "blossom" }
 
@@ -56,7 +56,7 @@ jline-reader = { group = "org.jline", name = "jline-reader", version.ref = "jlin
 
 methanol = { group = "com.github.mizosoft.methanol", name = "methanol", version.ref = "methanol" }
 
-minecraftauth = { group = "net.raphimc", name = "MinecraftAuth", version.ref = "minecraftauth" }
+minecraftauth = { group = "com.github.RaphiMC", name = "MinecraftAuth", version.ref = "minecraftauth" }
 
 netty-transport-nethernet = { group = "dev.kastle.netty", name = "netty-transport-nethernet", version.ref = "netty-transport-nethernet" }
 
@@ -85,6 +85,6 @@ protocol = [
 ]
 
 [plugins]
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 indra-git = { id = "net.kyori.indra.git", version.ref = "indra" }
 blossom = { id = "net.kyori.blossom", version.ref = "blossom" }

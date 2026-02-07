@@ -13,8 +13,10 @@ allprojects {
         maven("https://repo.opencollab.dev/main/")
         maven("https://repo.opencollab.dev/maven-snapshots/")
         maven("https://repo.opencollab.dev/maven-releases/")
-        maven("https://repo.geysermc.org/releases")
-        maven("https://repo.geysermc.org/snapshots")
+        // maven("https://repo.geysermc.org/releases")
+        // maven("https://repo.geysermc.org/snapshots")
+        // maven("https://repo.raphimc.net/repository/maven-snapshots/")
+        // maven("https://repo.raphimc.net/repository/maven-releases/")
         maven("https://repo.viaversion.com")
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://mvn.lumine.io/repository/maven-public/")
@@ -26,12 +28,12 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(21))
         }
     }
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release.set(17)
+        options.release.set(21)
     }
 }

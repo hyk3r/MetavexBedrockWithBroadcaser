@@ -1,4 +1,6 @@
-
 rootProject.name = "MetavexMCBroadcaster"
 
-include("core", "wrapper", "app", "installer")
+include("app")
+include("core")
+include("wrapper")
+include("installer")

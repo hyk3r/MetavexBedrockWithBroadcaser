@@ -17,6 +17,7 @@ import net.lenni0451.commons.httpclient.constants.HttpHeaders;
 import net.lenni0451.commons.httpclient.requests.impl.DeleteRequest;
 import net.lenni0451.commons.httpclient.requests.impl.PostRequest;
 import net.lenni0451.commons.httpclient.requests.impl.PutRequest;
+import net.lenni0451.commons.httpclient.content.impl.StringContent;
 import net.raphimc.minecraftauth.MinecraftAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,14 +175,15 @@ public class SessionManager {
             .put("connection", sessionInfo.getConnectionId());
 
 
-        PutRequest put = new PutRequest(url, GSON.toJson(req));
+        PutRequest put = new PutRequest(url);
+        put.setContent(new StringContent(GSON.toJson(req)));
         put.setHeader(HttpHeaders.AUTHORIZATION, token);
         put.setHeader("x-xbl-contract-version", "107");
         put.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
         HttpResponse resp = client.execute(put);
         if (resp.getStatusCode() >= 400) {
-            throw new IOException("Failed to create session: " + resp.getStatusCode() + " " + resp.getBodyAsString());
+            throw new IOException("Failed to create session: " + resp.getStatusCode() + " " + resp.getContent());
         }
 
         LOGGER.info(TranslationManager.get("session.created", sessionName));
@@ -189,7 +191,8 @@ public class SessionManager {
         // Create Handle (optional but good for invites)
         // POST https://sessiondirectory.xboxlive.com/handles
         CreateHandleRequest handleReq = CreateHandleRequest.create(scid, template, sessionName);
-        PostRequest postHandle = new PostRequest("https://sessiondirectory.xboxlive.com/handles", GSON.toJson(handleReq));
+        PostRequest postHandle = new PostRequest("https://sessiondirectory.xboxlive.com/handles");
+        postHandle.setContent(new StringContent(GSON.toJson(handleReq)));
         postHandle.setHeader(HttpHeaders.AUTHORIZATION, token);
         postHandle.setHeader("x-xbl-contract-version", "107");
         postHandle.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
