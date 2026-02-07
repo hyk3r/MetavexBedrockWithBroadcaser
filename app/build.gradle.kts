@@ -24,4 +24,6 @@ tasks.shadowJar {
     manifest {
         attributes["Main-Class"] = "hu.metavex.broadcaster.app.Main"
     }
+    // Merge Log4j2 plugin descriptor files from all dependencies
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer::class.java)
 }
