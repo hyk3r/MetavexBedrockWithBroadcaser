@@ -168,11 +168,16 @@ public class SessionManager {
         // I'll assume CreateSessionRequest is used here.
         CreateSessionRequest req = CreateSessionRequest.create(sessionInfo, authManager.getXuid());
         
-        // Add connection ID to properties if needed.
-        // req.members().get("me").get("constants").get("system").put("connection", sessionInfo.getConnectionId());
-        // Need to traverse the map or adjust the CreateSessionRequest.create method.
-        ((Map<String, Object>)((Map<String, Object>)((Map<String, Object>)req.members().get("me")).get("constants")).get("system"))
-            .put("connection", sessionInfo.getConnectionId());
+        // Add connection ID to member system properties
+        @SuppressWarnings("unchecked")
+        Map<String, Object> meMap = (Map<String, Object>) req.members().get("me");
+        if (meMap != null) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> systemMap = (Map<String, Object>) meMap.get("system");
+            if (systemMap != null) {
+                systemMap.put("connection", sessionInfo.getConnectionId());
+            }
+        }
 
 
         PutRequest put = new PutRequest(url);

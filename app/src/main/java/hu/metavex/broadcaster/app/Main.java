@@ -43,8 +43,8 @@ public class Main {
                 } catch (NumberFormatException e) {
                     config.setServerPort(19132);
                 }
-                config.setAutoUpdateServer(Boolean.parseBoolean(System.getenv().getOrDefault("BROADCASTER_AUTO_UPDATE", "true")));
-                config.setAutoRestartServer(Boolean.parseBoolean(System.getenv().getOrDefault("BROADCASTER_AUTO_RESTART", "true")));
+                config.setAutoUpdateServer(parseBoolean(System.getenv().getOrDefault("BROADCASTER_AUTO_UPDATE", "true")));
+                config.setAutoRestartServer(parseBoolean(System.getenv().getOrDefault("BROADCASTER_AUTO_RESTART", "true")));
                 saveConfig(config);
             } else {
                 config = SetupWizard.run();
@@ -148,5 +148,11 @@ public class Main {
             LOGGER.error("Failed to load config", e);
             return new BroadcasterConfig();
         }
+    }
+
+    private static boolean parseBoolean(String value) {
+        if (value == null) return false;
+        String v = value.trim().toLowerCase();
+        return v.equals("true") || v.equals("1") || v.equals("yes");
     }
 }
