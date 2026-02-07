@@ -5,9 +5,9 @@
 
 INSTALL_DIR="MetavexMCBroadcaster"
 JAR_NAME="MetavexMCBroadcaster.jar"
-GITHUB_REPO="Metavex/MetavexMCBroadcaster" # A felhasználó GitHub repója
+GITHUB_REPO="hyk3r/MetavexBedrockWithBroadcaser"
 
-echo "Started installing MetavexMCBroadcaster..."
+echo "MetavexMCBroadcaster Telepítése..."
 
 # Java ellenőrzése
 if ! command -v java &> /dev/null; then
@@ -21,23 +21,23 @@ if [[ "$JAVA_VER" -lt 17 ]]; then
     exit 1
 fi
 
-# Könyvtár létrehozása
 if [ -d "$INSTALL_DIR" ]; then
-    echo "A mappa már létezik. Frissítés..."
+    echo "A mappa már létezik. Belépés..."
 else
     mkdir "$INSTALL_DIR"
 fi
 cd "$INSTALL_DIR" || exit
 
-# Jar letöltése (GitHub Releases - Placeholder, amíg nincs release)
-# echo "Letöltés innen: https://github.com/$GITHUB_REPO/releases/latest/download/$JAR_NAME"
-# curl -L -o "$JAR_NAME" "https://github.com/$GITHUB_REPO/releases/latest/download/$JAR_NAME"
+echo "Legújabb verzió keresése a $GITHUB_REPO repóban..."
+LATEST_URL=$(curl --silent "https://api.github.com/repos/$GITHUB_REPO/releases/latest" | grep "browser_download_url" | grep ".jar" | cut -d : -f 2,3 | tr -d \")
 
-# Mivel még fejlesztés alatt áll, és a user buildeli, ezért feltételezzük, hogy a JAR-t manuálisan másolták ide vagy buildelték.
-# De a script később használható lesz.
-# Ideiglenes üzenet:
-echo "Mivel ez egy fejlesztői verzió, kérlek másold a 'app/build/libs/app-all.jar'-t ide '$INSTALL_DIR/$JAR_NAME' néven."
-echo "Ezután futtasd a './start.sh' parancsot."
+if [ ! -z "$LATEST_URL" ]; then
+    echo "Letöltés innen: $LATEST_URL"
+    curl -L -o "$JAR_NAME" "$LATEST_URL"
+else
+    echo "Nem található Release. Kérlek buildeld a projektet manuálisan, vagy töltsd le a forrást:"
+    echo "git clone https://github.com/$GITHUB_REPO.git"
+fi
 
 # Start script létrehozása
 cat <<EOF > start.sh

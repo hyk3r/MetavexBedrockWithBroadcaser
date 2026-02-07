@@ -1,104 +1,112 @@
 {
-    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY",
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
     "meta": {
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2024-05-20T12:00:00+00:00",
+    "exported_at": "2024-10-02T12:05:30+01:00",
     "name": "MetavexMCBroadcaster",
     "author": "hello@metavex.hu",
-    "description": "Minecraft Bedrock SzerverXbox Live Presence támogatással. A hivatalos Bedrock szervert csomagolja be és teszi elérhetővé barátoknak.",
+    "description": "Minecraft Bedrock Szerver Xbox Live Presence tamogatassal.",
     "features": null,
     "docker_images": {
-        "ghcr.io/pterodactyl/yolks:java_17": "Java 17"
+        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17"
     },
     "file_denylist": [],
-    "startup": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar MetavexMCBroadcaster.jar",
+    "startup": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
     "config": {
-        "files": "{\r\n    \"config.yml\": {\r\n        \"parser\": \"yaml\",\r\n        \"find\": {\r\n            \"serverPort\": \"{{SERVER_PORT}}\",\r\n            \"serverIp\": \"0.0.0.0\"\r\n        }\r\n    }\r\n}",
-        "startup": "{\r\n    \"done\": \"[Bedrock-Monitor] Server stopped\"\r\n}",
-        "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"logs/latest.log\"\r\n}",
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Server started.\"\r\n}",
+        "logs": "{}",
         "stop": "stop"
     },
     "scripts": {
         "installation": {
-            "script": "#!/bin/bash\r\n# MetavexMCBroadcaster Telepítő\r\n\r\napt update\r\napt install -y curl\r\n\r\n# Helyőrző a letöltési logikának\r\necho \"Mivel ez fejlesztői verzió, kérlek töltsd fel manuálisan a MetavexMCBroadcaster.jar fájlt!\"\r\n\r\nmkdir -p server\r\n\r\n# Java 17 meglétének ellenőrzése\r\njava -version\r\n",
-            "container": "ghcr.io/pterodactyl/installers:debian",
-            "entrypoint": "/bin/bash"
+            "script": "#!\/bin\/bash\r\n# MetavexMCBroadcaster install script.\r\n#\r\n# Server Files: \/mnt\/server\r\ncd \/mnt\/server\r\n\r\napt update\r\napt install -y curl jq\r\n\r\nGITHUB_PACKAGE=\"hyk3r\/MetavexBedrockWithBroadcaser\"\r\necho \"Checking releases for $GITHUB_PACKAGE...\"\r\n\r\nLATEST_JSON=$(curl --silent \"https:\/\/api.github.com\/repos\/$GITHUB_PACKAGE\/releases\/latest\")\r\nDOWNLOAD_URL=$(echo $LATEST_JSON | jq -r '.assets[] | select(.name | endswith(\".jar\")) | .browser_download_url' | head -n 1)\r\n\r\nif [ ! -z \"$DOWNLOAD_URL\" ] && [ \"$DOWNLOAD_URL\" != \"null\" ]; then\r\n    echo \"Release found, downloading: $DOWNLOAD_URL\"\r\n    curl -L -o ${SERVER_JARFILE} \"$DOWNLOAD_URL\"\r\nelse\r\n    echo \"No release found or API error.\"\r\n    echo \"PLEASE UPLOAD ${SERVER_JARFILE} MANUALLY VIA SFTP!\"\r\n    # Create a dummy file if not exists to prevent crash loop immediately, or let it fail.\r\n    # We let it fail so user sees the error.\r\nfi\r\n",
+            "container": "ghcr.io\/pterodactyl\/installers:debian",
+            "entrypoint": "bash"
         }
     },
     "variables": [
         {
-            "name": "Szerver Neve",
-            "description": "A szerver neve, ami megjelenik az Xbox Live barátlistán és a játékban.",
-            "env_variable": "BROADCASTER_SESSION_NAME",
-            "default_value": "Metavex Bedrock Szerver",
+            "name": "Jar File",
+            "description": "The name of the jarfile to be used when downloading and running.",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "MetavexMCBroadcaster.jar",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|string|max:64"
+            "rules": "required|string",
+            "field_type": "text"
         },
         {
-            "name": "Bedrock Verzió",
-            "description": "A letöltendő Bedrock szerver verziója. Használd a 'latest' értéket a legújabbhoz.",
+            "name": "Szerver Neve",
+            "description": "A szerver neve.",
+            "env_variable": "BROADCASTER_SESSION_NAME",
+            "default_value": "Metavex Szerver",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Bedrock Verzio",
+            "description": "Bedrock szerver verzioja (pl. latest).",
             "env_variable": "BEDROCK_VERSION",
             "default_value": "latest",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|string"
+            "rules": "required|string",
+            "field_type": "text"
         },
         {
-            "name": "Játékmód (Gamemode)",
-            "description": "Az alapértelmezett játékmód.",
+            "name": "Jatekmod",
+            "description": "Alapertelmezett jatekmod.",
             "env_variable": "LEVEL_GAMEMODE",
             "default_value": "survival",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|in:survival,creative,adventure"
+            "rules": "required|string|in:survival,creative,adventure",
+            "field_type": "text"
         },
         {
-            "name": "Nehézség (Difficulty)",
-            "description": "A játék nehézségi szintje.",
+            "name": "Nehesseg",
+            "description": "Jatek nehessege.",
             "env_variable": "LEVEL_DIFFICULTY",
             "default_value": "normal",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|in:peaceful,easy,normal,hard"
+            "rules": "required|string|in:peaceful,easy,normal,hard",
+            "field_type": "text"
         },
         {
-            "name": "Bedrock Port (IPv4)",
-            "description": "Az elsődleges IPv4 port a szerverhez.",
-            "env_variable": "SERVER_PORT",
-            "default_value": "19132",
-            "user_viewable": true,
-            "user_editable": false,
-            "rules": "required|integer|between:1024,65535"
-        },
-        {
-            "name": "Bedrock Port (IPv6)",
-            "description": "Az IPv6 port a szerverhez.",
+            "name": "Bedrock Port IPv6",
+            "description": "Szerver port (IPv6).",
             "env_variable": "SERVER_PORT_V6",
             "default_value": "19133",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|between:1024,65535"
+            "rules": "required|string",
+            "field_type": "text"
         },
         {
-            "name": "Világ Mag (Seed)",
-            "description": "A világ generálásához használt seed. Hagyd üresen véletlenszerűhöz.",
+            "name": "Level Seed",
+            "description": "Vilag generalasi seed.",
             "env_variable": "LEVEL_SEED",
             "default_value": "",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "nullable|string"
+            "rules": "nullable|string",
+            "field_type": "text"
         },
         {
-            "name": "Automatikus Frissítés",
-            "description": "Frissüljön-e automatikusan a szerver indításkor?",
+            "name": "Auto Update",
+            "description": "Automatikus szerver frissites (1 = be, 0 = ki).",
             "env_variable": "BROADCASTER_AUTO_UPDATE",
-            "default_value": "true",
+            "default_value": "1",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|boolean"
+            "rules": "required|boolean",
+            "field_type": "text"
         }
     ]
 }

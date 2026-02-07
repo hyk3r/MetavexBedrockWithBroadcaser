@@ -1,74 +1,88 @@
 # MetavexMCBroadcaster
 
-A **MetavexMCBroadcaster** egy modern, Java-alapú "Wrapper" alkalmazás Minecraft Bedrock szerverekhez. Célja, hogy lehetővé tegye a konzolos (Xbox, PlayStation, Switch) játékosok csatlakozását dedikált szerverekhez az Xbox Live "Barátok" (Friends) listáján keresztül, anélkül, hogy DNS trükközésre lenne szükség.
+Ez a projekt egy **Minecraft Bedrock Dedicated Server** wrapper alkalmazás, amely lehetővé teszi a szerver megjelenését az **Xbox Live barátok listáján** (LAN / Friends tab) konzolos játékosok számára (Xbox, PlayStation, Switch).
+
+A szoftver automatikusan kezeli a Bedrock szerver letöltését, frissítését, konfigurálását, és biztosítja a szükséges "Advertisement" csomagok küldését az Xbox Live hálózat felé.
 
 ## Funkciók
 
-*   **Xbox Live Presence**: A szerver megjelenik a barátok listáján mint "Joinable Game".
-*   **Magyar Lokalizáció**: Minden konzolüzenet és beállítás varázsló magyar nyelvű.
-*   **Wrapper Architektúra**: Kezeli a `bedrock_server` folyamatot, újraindítja ha összeomlik.
-*   **Auto-Update**:
-    *   Automatikusan letölti és frissíti a hivatalos Bedrock szervert indításkor.
-*   **Könnyű Telepítés**: Interaktív Setup Wizard az első indításkor.
-*   **Pterodactyl Támogatás**: Kész Egg fájl és Docker támogatás.
-
-## Követelmények
-
-*   Java 17 vagy újabb
-*   Linux (ajánlott) vagy Windows
-*   Microsoft Fiók (kizárólag erre a célra, Game Pass nem szükséges)
+*   🚀 **Xbox Live Presence**: A szerver megjelenik a barátoknál, mintha egy barát játszana.
+*   🔄 **Automatikus Frissítés**:
+    *   **Bedrock Szerver**: Indításkor ellenőrzi és letölti a legújabb (vagy a kért) verziót.
+    *   **Broadcaster**: Képes önmagát frissíteni GitHub Release-ből.
+*   ⚙️ **Dinamikus Konfiguráció**: Környezeti változókból (ENV) állítja be a `server.properties`-t (pl. Port, Játékmód, Nehézség, Seed).
+*   🐳 **Docker & Pterodactyl Support**: Hivatalos Docker image és Pterodactyl Egg támogatás.
+*   🇭🇺 **Magyar Nyelvű**: A telepítő és a konzol üzenetek magyarul kommunikálnak.
 
 ## Telepítés
 
-### Linux (Native)
+### 1. Pterodactyl (Ajánlott)
 
-1.  Másold a `MetavexMCBroadcaster.jar`-t egy mappába.
-2.  Futtasd a telepítő scriptet (opcionális segédlet):
-    ```bash
-    chmod +x install.sh
-    ./install.sh
-    ```
-3.  Indítsd el:
-    ```bash
-    ./start.sh
-    ```
-4.  Kövessd a Setup Wizard utasításait a konzolon.
+A projekt tartalmaz egy előre elkészített Pterodactyl Egg-et, amely mindent automatikusan elvégez.
 
-### Pterodactyl
+1.  Töltsd le az `ecosystem/pterodactyl/egg-metavex-mc-broadcaster.json` fájlt.
+2.  Importáld a Pterodactyl Admin panelen a **Nests** menüpontban.
+3.  Hozz létre egy új szervert ezzel az Egg-el.
+4.  A telepítés után a szerver automatikusan elindul, letölti a Bedrock szervert és beállítja magát.
 
-1.  Importáld az `ecosystem/pterodactyl/egg-metavex-mc-broadcaster.json` tojást.
-2.  Hozz létre egy szervert ezzel a tojással.
-3.  Az első indításnál a konzolon kövesd a Microsoft Auth linket és írd be a kódot.
+### 2. Docker
 
-## Konfiguráció (`config.yml`)
+Futtatható Docker konténerként is:
 
-A `config.yml` automatikusan létrejön az első indításkor.
-
-```yaml
-sessionName: "Saját Minecraft Szerver"
-serverIp: "127.0.0.1"
-serverPort: 19132
-autoUpdateServer: true
-autoRestartServer: true
+```bash
+docker run -d \
+  -p 19132:19132/udp \
+  -e SERVER_PORT=19132 \
+  -e LEVEL_GAMEMODE=survival \
+  -e BROADCASTER_SESSION_NAME="Sajat Szerver" \
+  ghcr.io/metavex/metavex-mc-broadcaster:latest
 ```
 
-## Microsoft Hitelesítés
+### 3. Manuális Telepítés (Linux)
 
-Az első indításkor a konzol kiír egy linket (`microsoft.com/link`) és egy kódot.
-1.  Nyisd meg a linket a böngésződben.
-2.  Jelentkezz be azzal a Microsoft fiókkal, ami a "Broadcaster" (Szerver) fiók lesz.
-3.  Írd be a kódot.
-4.  A szerver automatikusan tovább lép.
+Követelmények:
+*   Java 17 vagy újabb
+*   `curl`, `unzip`
 
-**Fontos**: Ezt a fiókot kell "Barátnak" jelölniük a játékosoknak ahhoz, hogy lássák a szervert.
+**Telepítés:**
+```bash
+curl -sL https://raw.githubusercontent.com/hyk3r/MetavexBedrockWithBroadcaser/main/install.sh | bash
+```
+
+**Indítás:**
+```bash
+./start.sh
+```
+
+## Konfiguráció
+
+A szerver elsősorban **Környezeti Változókkal (Environment Variables)** konfigurálható. Ha Pterodactylt használsz, ezeket a "Startup" fülön találod.
+
+| Változó | Leírás | Alapérték |
+| :--- | :--- | :--- |
+| `SERVER_JARFILE` | A futtatandó JAR fájl neve. | `MetavexMCBroadcaster.jar` |
+| `BROADCASTER_SESSION_NAME` | A szerver neve, ami megjelenik Xbox Live-on. | `Metavex Szerver` |
+| `BEDROCK_VERSION` | A letöltendő Bedrock szerver verziója. | `latest` |
+| `LEVEL_GAMEMODE` | Játékmód (`survival`, `creative`, `adventure`). | `survival` |
+| `LEVEL_DIFFICULTY` | Nehézség (`peaceful`, `easy`, `normal`, `hard`). | `normal` |
+| `SERVER_PORT` | IPv4 Port (UDP). | `19132` |
+| `SERVER_PORT_V6` | IPv6 Port (UDP). | `19133` |
+| `LEVEL_SEED` | Világgenerálási seed. | (üres = véletlenszerű) |
+| `BROADCASTER_AUTO_UPDATE` | Szerver automatikus frissítése (`true`/`false`). | `true` |
+
+## Hibaelhárítás
+
+*   **Nem  lehet csatlakozni**: Ellenőrizd, hogy a 19132-es UDP port nyitva van-e a tűzfalon.
+*   **Token hiba**: A Broadcaster első indításkor kérhet egy Microsoft hitelesítést (Device Code Flow). A konzolon megjelenő linket nyisd meg és írd be a kódot.
+*   **Pterodactyl Import Hiba**: Győződj meg róla, hogy a legfrissebb `egg-metavex-mc-broadcaster.json` fájlt használod. Ne módosítsd a JSON szerkezetét kézzel.
 
 ## Fejlesztőknek
 
-A projekt Gradle-t használ.
-
-Buildelés:
+**Buildelés:**
 ```bash
-./gradlew shadowJar
+./gradlew build
 ```
+A kész JAR fájl a `app/build/libs` mappában lesz.
 
-A kész JAR fájl az `app/build/libs/app-all.jar` helyen lesz.
+---
+© 2024 Metavex - Minden jog fenntartva.
