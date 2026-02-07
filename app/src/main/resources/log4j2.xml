@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" packages="net.minecrell.terminalconsole">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
-        </Console>
-        <TerminalConsole name="TerminalConsole">
+        <TerminalConsole name="Console">
             <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
         </TerminalConsole>
         <RollingFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
@@ -18,7 +15,7 @@
     </Appenders>
     <Loggers>
         <Root level="info">
-            <AppenderRef ref="TerminalConsole"/>
+            <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Root>
     </Loggers>
