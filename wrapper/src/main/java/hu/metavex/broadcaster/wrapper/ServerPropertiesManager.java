@@ -29,6 +29,7 @@ public class ServerPropertiesManager {
             // Better to let the server generate default? No, we need to set values.
             // Let's create it.
             try {
+                Files.createDirectories(propertiesFile.getParent());
                 Files.createFile(propertiesFile);
             } catch (IOException e) {
                 LOGGER.error("Failed to create server.properties", e);
