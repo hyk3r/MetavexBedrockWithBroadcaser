@@ -1,0 +1,104 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-05-20T12:00:00+00:00",
+    "name": "MetavexMCBroadcaster",
+    "author": "hello@metavex.hu",
+    "description": "Minecraft Bedrock SzerverXbox Live Presence támogatással. A hivatalos Bedrock szervert csomagolja be és teszi elérhetővé barátoknak.",
+    "features": null,
+    "docker_images": {
+        "ghcr.io/pterodactyl/yolks:java_17": "Java 17"
+    },
+    "file_denylist": [],
+    "startup": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar MetavexMCBroadcaster.jar",
+    "config": {
+        "files": "{\r\n    \"config.yml\": {\r\n        \"parser\": \"yaml\",\r\n        \"find\": {\r\n            \"serverPort\": \"{{SERVER_PORT}}\",\r\n            \"serverIp\": \"0.0.0.0\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \"[Bedrock-Monitor] Server stopped\"\r\n}",
+        "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"logs/latest.log\"\r\n}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\r\n# MetavexMCBroadcaster Telepítő\r\n\r\napt update\r\napt install -y curl\r\n\r\n# Helyőrző a letöltési logikának\r\necho \"Mivel ez fejlesztői verzió, kérlek töltsd fel manuálisan a MetavexMCBroadcaster.jar fájlt!\"\r\n\r\nmkdir -p server\r\n\r\n# Java 17 meglétének ellenőrzése\r\njava -version\r\n",
+            "container": "ghcr.io/pterodactyl/installers:debian",
+            "entrypoint": "/bin/bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Szerver Neve",
+            "description": "A szerver neve, ami megjelenik az Xbox Live barátlistán és a játékban.",
+            "env_variable": "BROADCASTER_SESSION_NAME",
+            "default_value": "Metavex Bedrock Szerver",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:64"
+        },
+        {
+            "name": "Bedrock Verzió",
+            "description": "A letöltendő Bedrock szerver verziója. Használd a 'latest' értéket a legújabbhoz.",
+            "env_variable": "BEDROCK_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Játékmód (Gamemode)",
+            "description": "Az alapértelmezett játékmód.",
+            "env_variable": "LEVEL_GAMEMODE",
+            "default_value": "survival",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:survival,creative,adventure"
+        },
+        {
+            "name": "Nehézség (Difficulty)",
+            "description": "A játék nehézségi szintje.",
+            "env_variable": "LEVEL_DIFFICULTY",
+            "default_value": "normal",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|in:peaceful,easy,normal,hard"
+        },
+        {
+            "name": "Bedrock Port (IPv4)",
+            "description": "Az elsődleges IPv4 port a szerverhez.",
+            "env_variable": "SERVER_PORT",
+            "default_value": "19132",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|integer|between:1024,65535"
+        },
+        {
+            "name": "Bedrock Port (IPv6)",
+            "description": "Az IPv6 port a szerverhez.",
+            "env_variable": "SERVER_PORT_V6",
+            "default_value": "19133",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1024,65535"
+        },
+        {
+            "name": "Világ Mag (Seed)",
+            "description": "A világ generálásához használt seed. Hagyd üresen véletlenszerűhöz.",
+            "env_variable": "LEVEL_SEED",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "Automatikus Frissítés",
+            "description": "Frissüljön-e automatikusan a szerver indításkor?",
+            "env_variable": "BROADCASTER_AUTO_UPDATE",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean"
+        }
+    ]
+}
