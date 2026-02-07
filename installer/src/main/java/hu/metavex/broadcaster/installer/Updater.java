@@ -6,6 +6,10 @@ import net.lenni0451.commons.httpclient.HttpResponse;
 import net.lenni0451.commons.httpclient.requests.impl.GetRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -15,15 +19,13 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class Updater {
     private static final Logger LOGGER = LoggerFactory.getLogger(Updater.class);
-    private static final String DOWNLOAD_PAGE = "https://www.minecraft.net/en-us/download/server/bedrock";
-    private static final Pattern LINK_PATTERN = Pattern.compile("https://minecraft\\.azureedge\\.net/bin-linux/bedrock-server-[0-9.]+\\.zip");
+    private static final String DOWNLOAD_API = "https://net-secondary.web.minecraft-services.net/api/v1.0/download/links";
+    private static final Gson GSON = new Gson();
     
     private final Path serverDir;
 
@@ -34,32 +36,36 @@ public class Updater {
     public void checkForUpdates(String targetVersion) {
         LOGGER.info(TranslationManager.get("updater.checking"));
         
-        if (!"latest".equalsIgnoreCase(targetVersion)) {
-             LOGGER.warn("Specific version downloading is experimental. Logic defaults to latest for now as Microsoft does not provide a version archive public API easily. Target: " + targetVersion);
-             // In a real scenario, we might try to construct a URL if we knew the schema, but it changes.
-             // For now, we proceed with latest check but warn.
-        }
-
         try {
             HttpClient client = new HttpClient();
-            HttpResponse response = client.execute(new GetRequest(DOWNLOAD_PAGE));
+            HttpResponse response = client.execute(new GetRequest(DOWNLOAD_API));
             if (response.getStatusCode() != 200) {
                 LOGGER.error(TranslationManager.get("updater.check_failed", response.getStatusCode()));
                 return;
             }
 
-            String html = response.getContentAsString();
-            Matcher matcher = LINK_PATTERN.matcher(html);
-            if (matcher.find()) {
-                String downloadUrl = matcher.group();
+            String json = response.getContentAsString();
+            JsonObject root = GSON.fromJson(json, JsonObject.class);
+            JsonObject result = root.getAsJsonObject("result");
+            JsonArray links = result.getAsJsonArray("links");
+            
+            String downloadUrl = null;
+            for (JsonElement elem : links) {
+                JsonObject link = elem.getAsJsonObject();
+                String type = link.get("downloadType").getAsString();
+                if ("serverBedrockLinux".equals(type)) {
+                    downloadUrl = link.get("downloadUrl").getAsString();
+                    break;
+                }
+            }
+            
+            if (downloadUrl != null) {
                 String fileName = downloadUrl.substring(downloadUrl.lastIndexOf('/') + 1);
                 String version = fileName.replace("bedrock-server-", "").replace(".zip", "");
                 
                 LOGGER.info(TranslationManager.get("updater.found_version", version));
                 
-                // version check logic (e.g. check if bedrock_server executable exists or version file)
-                // For simplicity, we can just download if not present or force update flag is set.
-                // Or check a stored version file.
+                // Check if we need to update
                 if (shouldUpdate(version)) {
                     downloadAndInstall(downloadUrl, fileName);
                     saveVersion(version);
@@ -77,6 +83,11 @@ public class Updater {
     private boolean shouldUpdate(String newVersion) {
         try {
             Path versionFile = serverDir.resolve("version.txt");
+            Path executable = serverDir.resolve("bedrock_server");
+            
+            // Always update if executable doesn't exist
+            if (!Files.exists(executable)) return true;
+            
             if (!Files.exists(versionFile)) return true;
             String currentVersion = Files.readString(versionFile).trim();
             return !currentVersion.equals(newVersion);
@@ -97,11 +108,14 @@ public class Updater {
         LOGGER.info(TranslationManager.get("updater.downloading", fileName));
         Path zipPath = serverDir.resolve(fileName);
         try {
+            // Create server directory if not exists
+            Files.createDirectories(serverDir);
+            
             try (BufferedInputStream in = new BufferedInputStream(new URL(urlStr).openStream());
                  FileOutputStream fileOutputStream = new FileOutputStream(zipPath.toFile())) {
-                byte dataBuffer[] = new byte[1024];
+                byte dataBuffer[] = new byte[8192];
                 int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                while ((bytesRead = in.read(dataBuffer, 0, dataBuffer.length)) != -1) {
                     fileOutputStream.write(dataBuffer, 0, bytesRead);
                 }
             }
@@ -114,6 +128,7 @@ public class Updater {
             File executable = serverDir.resolve("bedrock_server").toFile();
             if (executable.exists()) {
                 executable.setExecutable(true);
+                LOGGER.info("Set executable permission on bedrock_server");
             }
             
             LOGGER.info(TranslationManager.get("updater.success"));
@@ -129,11 +144,11 @@ public class Updater {
             while (entry != null) {
                 Path filePath = destDir.resolve(entry.getName());
                 if (!entry.isDirectory()) {
-                    // Extract file
-                    // Don't overwrite config files if they exist (server.properties, whitelist.json, permissions.json)
+                    // Don't overwrite config files if they exist
                     String name = entry.getName();
                     if (Files.exists(filePath) && (name.equals("server.properties") || name.equals("whitelist.json") || name.equals("permissions.json"))) {
                          // Skip overwriting config
+                         LOGGER.debug("Skipping existing config file: " + name);
                     } else {
                         Files.createDirectories(filePath.getParent());
                         Files.copy(zipIn, filePath, StandardCopyOption.REPLACE_EXISTING);
