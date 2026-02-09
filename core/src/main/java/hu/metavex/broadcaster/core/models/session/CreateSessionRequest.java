@@ -1,6 +1,5 @@
 package hu.metavex.broadcaster.core.models.session;
 
-import hu.metavex.broadcaster.core.Constants;
 import hu.metavex.broadcaster.core.SessionInfo;
 
 import java.util.HashMap;
@@ -35,12 +34,21 @@ public record CreateSessionRequest(
         properties.put("custom", new HashMap<>());
 
         Map<String, Object> me = new HashMap<>();
-        Map<String, Object> meConstants = new HashMap<>();
-        Map<String, Object> meSystem = new HashMap<>();
-        meSystem.put("xuid", xuid);
-        meSystem.put("initialize", true);
-        meConstants.put("system", meSystem);
-        me.put("me", meConstants);
+
+        Map<String, Object> constants = new HashMap<>();
+        Map<String, Object> constantsSystem = new HashMap<>();
+        constantsSystem.put("xuid", xuid);
+        constants.put("system", constantsSystem);
+
+        Map<String, Object> memberProperties = new HashMap<>();
+        Map<String, Object> memberSystemProperties = new HashMap<>();
+        memberSystemProperties.put("initialize", true);
+        memberProperties.put("system", memberSystemProperties);
+
+        Map<String, Object> memberPayload = new HashMap<>();
+        memberPayload.put("constants", constants);
+        memberPayload.put("properties", memberProperties);
+        me.put("me", memberPayload);
 
         return new CreateSessionRequest(properties, me, 1);
     }

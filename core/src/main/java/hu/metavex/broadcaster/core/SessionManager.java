@@ -168,14 +168,18 @@ public class SessionManager {
         // I'll assume CreateSessionRequest is used here.
         CreateSessionRequest req = CreateSessionRequest.create(sessionInfo, authManager.getXuid());
         
-        // Add connection ID to member system properties
+        // Add connection ID to member properties.system
         @SuppressWarnings("unchecked")
         Map<String, Object> meMap = (Map<String, Object>) req.members().get("me");
         if (meMap != null) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> systemMap = (Map<String, Object>) meMap.get("system");
-            if (systemMap != null) {
-                systemMap.put("connection", sessionInfo.getConnectionId());
+            Map<String, Object> propertiesMap = (Map<String, Object>) meMap.get("properties");
+            if (propertiesMap != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> systemMap = (Map<String, Object>) propertiesMap.get("system");
+                if (systemMap != null) {
+                    systemMap.put("connection", sessionInfo.getConnectionId());
+                }
             }
         }
 
